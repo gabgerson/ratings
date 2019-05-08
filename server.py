@@ -45,15 +45,25 @@ def register_process():
     email = request.form.get('email')
     password = request.form.get('password')
 
+    my_query = User.query.filter(User.email==email).first()
+    # query_email = my_query.email
+
     # if User.query.filter(User.email==email) == email:
     #     pass
-    if User.query.filter(User.email==email).all() != email:
-    # if User.query.filter(User.email==None):
+
+    if my_query == None:
         user = User(email=email, password=password)
 
         db.session.add(user)
         db.session.commit()
+    # elif my_query.email != email:
     else:
+    # if User.query.filter(User.email==None):
+        # user = User(email=email, password=password)
+
+        # db.session.add(user)
+        # db.session.commit()
+    # elif
         flash('This user already exists.')
 
     return redirect("/")
