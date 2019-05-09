@@ -45,29 +45,100 @@ def register_process():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    my_query = User.query.filter(User.email==email).first()
-    # query_email = my_query.email
-
-    # if User.query.filter(User.email==email) == email:
-    #     pass
-
-    if my_query == None:
+    if User.query.filter(User.email==email).first() == None:
         user = User(email=email, password=password)
 
         db.session.add(user)
         db.session.commit()
-    # elif my_query.email != email:
     else:
-    # if User.query.filter(User.email==None):
-        # user = User(email=email, password=password)
-
-        # db.session.add(user)
-        # db.session.commit()
-    # elif
         flash('This user already exists.')
 
     return redirect("/")
 
+
+@app.route("/login", methods=["GET"])
+def login_form():
+
+    return render_template("login_form.html")
+
+
+@app.route("/login", methods=["POST"])
+def login_process():
+
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    user_query = User.query.filter(User.email == email, User.password == password).first()
+
+    if user_query != None: 
+        session["username"] = email
+        flash('Logged in')
+        user_id = user_query.user_id
+        return redirect("/users/" + str(user_id))
+    else: 
+        flash('Username and password do not match.')
+        return redirect("/login")
+
+
+@app.route("/logout")
+def logout_process():
+    session.pop("username")
+    return redirect("/")
+
+
+@app.route("/users/<user_id>")
+def user_details(user_id):
+
+    user = User.query.get(user_id)
+
+    return render_template("user_details.html",
+                            user=user)
+
+@app.route("/movies")
+def movie_list():
+
+    movies = Movie.query.order_by('title').all()
+    return render_template("movie_list.html", movies=movies)
+
+
+@app.route("/movies/<movie_id>")
+def movie_details(movie_id):
+
+    movie = Movie.query.get(movie_id)
+
+    return render_template("movie_details.html",
+                            movie=movie)
+
+
+@app.route("/movies/<movie_id>", methods=["POST"])
+def user_rating(movie_id):
+
+    # Retrieve rating from form 
+    rating = request.form.get('user_rating')
+
+    # If logged in, get email to use in query
+    email = session["username"]
+
+    # Getting the user id with a query and getting user_id attribute
+    user= User.query.filter(User.email == email).first()
+    user_id = user.user_id
+
+    # Querying for the user's rating 
+    user_rating = Rating.query.filter(Rating.user_id == user_id, 
+                                 Rating.movie_id == movie_id).first()
+
+    # If the rating does not exist, add it to the ratings table and save 
+    if user_rating == None: 
+        user_rating = Rating(score=rating, user_id=user_id, movie_id=movie_id)
+
+        db.session.add(user_rating)
+        db.session.commit()
+    # Else update the rating in the table and save 
+    else:
+        user_rating.score = rating
+        db.session.commit()
+
+    return redirect("/")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
