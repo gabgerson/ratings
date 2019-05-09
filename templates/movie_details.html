@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>Movie</h2>
+
+    <ul>
+        Movie Title: {{ movie.title }}
+        <br> 
+        Movie Release Date: {{ movie.released_at }}
+        <br>
+        IMDB Link: {{ movie.imdb_url }}
+        <br>
+        Movie ID: {{ movie.movie_id }}
+
+
+    {% if session.get('username') %}
+        <form action="/movies/{{ movie.movie_id }}" method="post">
+            <input type="number" name="user_rating" min="1" max="5">
+        </form>
+
+    {% endif %}
+
+    </ul>
+
+{% endblock %}
