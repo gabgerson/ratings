@@ -106,8 +106,45 @@ def movie_details(movie_id):
 
     movie = Movie.query.get(movie_id)
 
+    if "username" in session:
+
+        email = session["username"]
+
+        # user_id = (User.query.filter(User.email == email).first()).user_id
+        
+        user = User.query.filter(User.email == email).first()
+        user_id = user.user_id
+
+        user_rating = Rating.query.filter(Rating.user_id == user_id, 
+                                 Rating.movie_id == movie_id).first()
+
+        rating_scores = [r.score for r in movie.ratings]
+        avg_rating = float(sum(rating_scores)) / len(rating_scores)
+
+        prediction = None
+
+        # Prediction code: only predict if the user hasn't rated it.
+
+        if (not user_rating) and user_id:
+            user = User.query.get(user_id)
+            if user:
+                prediction = user.predict_rating(movie)
+
+        return render_template(
+            "movie_details.html",
+            movie=movie,
+            user_rating=user_rating,
+            average=avg_rating,
+            prediction=prediction
+            )
+
+        # return render_template("movie_details.html",
+        #                     movie=movie,
+        #                     user_rating=user_rating)
+
     return render_template("movie_details.html",
-                            movie=movie)
+                            movie=movie,)
+                            # user_rating=user_rating)
 
 
 @app.route("/movies/<movie_id>", methods=["POST"])
@@ -153,3 +190,14 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')
+
+
+
+
+
+
+
+        
+  # <!--  {% if user_rating != None %}
+  #       Your rating for this movie: {{ user_rating.score }}</p>
+  #   {% endif %} -->

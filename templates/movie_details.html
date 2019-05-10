@@ -11,14 +11,33 @@
         IMDB Link: {{ movie.imdb_url }}
         <br>
         Movie ID: {{ movie.movie_id }}
+        <br>
+     
 
 
     {% if session.get('username') %}
+        
+        {% if user_rating != none%}
+           Your Rating: {{ user_rating.score }}
+        {% elif user_rating == none %}
+            You have not rated this movie. 
+        {% endif %}
+
         <form action="/movies/{{ movie.movie_id }}" method="post">
             <input type="number" name="user_rating" min="1" max="5">
+            <input type="submit" name="submit">
         </form>
 
+        <p>Average rating: {{ average }}</p>
+        {% if prediction %}
+            <p>We predict you will rate this movie {{ prediction }}.</p>
+        {% endif %}
+
+
+
     {% endif %}
+
+    
 
     </ul>
 

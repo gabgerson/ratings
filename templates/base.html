@@ -11,12 +11,36 @@
 
 <body>
     
+    <div>
+        
+        <span>
+       {% if session.get('username') %}
+        <a href="/logout">Log Out</a>
+        {% else %}
+        <a href="/login">Log In</a>
+        {% endif %}
+        </span>
 
-    {% if session.get('username') %}
-    <a href="/logout">Log Out</a>
-    {% else %}
-    <a href="/login">Log In</a>
-    {% endif %}
+        <span>&nbsp;&nbsp;</span>
+
+        <span>
+            <a href="/">Home</a> 
+        </span>
+       
+        <span>&nbsp;&nbsp;</span>
+
+        <span>
+            <a href="/movies">Movies</a> 
+        </span>
+    
+        <span>&nbsp;&nbsp;</span>
+
+        <span>
+            <a href="/users">Users</a> 
+        </span>
+
+    </div>
+    
     
     
     <hr>
